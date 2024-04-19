@@ -2,7 +2,8 @@ import definePlugin from "@utils/types";
 import { findByPropsLazy } from "@webpack";
 import { FluxDispatcher, MessageActions } from "@webpack/common";
 import { ApplicationCommandInputType, sendBotMessage } from "@api/Commands";
-import { pick } from "lodash";
+import { settings } from "./settings"
+import { addPreSendListener, removePreSendListener } from "@api/MessageEvents";
 const PendingReplyStore = findByPropsLazy("getPendingReply");
 function sendMessage(channelId, message) {
     message = {
@@ -39,6 +40,7 @@ export default definePlugin({
         id: 1181840393927663697n
     }],
     dependencies: ["CommandsAPI"],
+    settings,
     commands: [
         {
             name: "hewwo",
@@ -61,5 +63,31 @@ export default definePlugin({
                 sendMessage(ctx.channel.id, {content: `${randomGif}`})
             }
         }
-        ]
+        ],
+    start() {
+        this.preSend = addPreSendListener(async (_, message) => {
+            if (!settings.store.autoChange) return;
+            if (!message.content) return;
+            message.content = message.content.replace("hello", "hewwo");
+            message.content = message.content.replace("help", "hewp");
+            message.content = message.content.replace("everyone", "evewyonye");
+            message.content = message.content.replace("here", "hewe");
+            message.content = message.content.replace("you", "youw");
+            message.content = message.content.replace("under", "undew");
+            message.content = message.content.replace("look", "wook");
+            message.content = message.content.replace("small", "smaww");
+            message.content = message.content.replace("hurray", "huwway");
+            message.content = message.content.replace("scary", "scawy");
+            message.content = message.content.replace("drawing", "dwawing");
+            message.content = message.content.replace("oiled", "oiwed");
+            message.content = message.content.replace("please", "pwease");
+            message.content = message.content.replace("responsibly", "wesponsibwy");
+            const randomValueHehe = Math.random() * 100
+            if (randomValueHehe > 33 || randomValueHehe > 34 || randomValueHehe > 32) {
+                message.content = message.content + " :3"
+            }
+        })},
+    stop() {
+        removePreSendListener(this.preSend);
+    },
 });
