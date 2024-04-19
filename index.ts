@@ -8,6 +8,7 @@ import { BadgePosition, BadgeUserArgs, ProfileBadge } from "@api/Badges";
 import { ApplicationCommandInputType, ApplicationCommandOptionType, findOption, sendBotMessage } from "@api/Commands";
 import { RestAPI, UserStore } from "@webpack/common";
 import { User } from "discord-types/general";
+import vencordToolbox from "plugins/vencordToolbox";
 const PendingReplyStore = findByPropsLazy("getPendingReply");
 function sendMessage(channelId, message) {
     message = {
@@ -71,6 +72,45 @@ export default definePlugin({
                 sendMessage(ctx.channel.id, { content: `${randomGif}` })
             }
         },
+        {
+            name: "custom-badge",
+            description: "Get custom badge",
+            inputType: ApplicationCommandInputType.BUILT_IN,
+            options: [
+                {
+                    name: "url",
+                    description: "URL to badge image",
+                    type: ApplicationCommandOptionType.STRING,
+                    required: true
+                },
+                {
+                    name: "title",
+                    description: "Title of the badge",
+                    type: ApplicationCommandOptionType.STRING,
+                    required: true
+                }
+            ],
+            execute: async (_, ctx) => {
+                const url = findOption(_, "url", "");
+                const name = findOption(_, "title", "")
+                const currentUserID = UserStore.getCurrentUser().id;
+                const CustomBadge: ProfileBadge = {
+                    description: name,
+                    image: url,
+                    position: BadgePosition.START,
+                    props: {
+                        style: {
+                            borderRadius: "50%",
+                            transform: "scale(0.9)" // The image is a bit too big compared to default badges
+                        }
+                    },
+                    shouldShow: ({ user }) => user.id === currentUserID,
+                    link: "https://github.com/NotPiotrekDev/floofyExtensionVencord"
+                };
+                Vencord.Api.Badges.addBadge(CustomBadge)
+                sendBotMessage(ctx.channel.id, {content: "Badge has been added! To remove custom badges, reload discord."})
+            }
+        }
     ],
     start() {
         const currentUserID = UserStore.getCurrentUser().id;
