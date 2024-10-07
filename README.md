@@ -1,6 +1,9 @@
 # floofyExtensionVencord
 vewy floofy extension to vencord
 
+# ❗| Warning
+This plugin is discontinued. If you want, you can fork it, update and keep working on it.
+
 ### ❓ | Info
 You need NodeJS installed
 
